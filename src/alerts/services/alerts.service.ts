@@ -9,9 +9,11 @@ import { AlertEntity } from '../../entities/alert.entity/alert.entity';
 import { CallLogEntity } from '../../entities/call-log.entity/call-log.entity';
 import { CreateAlertDto } from '../dto/create-alert.dto';
 import { UpdateAlertStatusDto } from '../dto/update-alert-status.dto';
+import { UpdateAlertAssignmentDto } from '../dto/update-alert-assignment.dto';
 import { SearchAlertsDto } from '../dto/search-alerts.dto';
 import { AlertSeverityEnum } from '../../enum/alert.severity.enum';
 import { AlertStatusEnum } from '../../enum/alert.status.enum';
+import { AlertTypeEnum } from '../../enum/alert.type.enum';
 import { CallStatusEnum } from '../../enum/call.status.enum';
 
 @Injectable()
@@ -31,16 +33,35 @@ export class AlertsService {
       throw new BadRequestException('Merchant ID is required');
     }
 
+    if (!createAlertDto.alertType) {
+      throw new BadRequestException('Alert type is required');
+    }
+
     // Validate severity enum
     if (!Object.values(AlertSeverityEnum).includes(createAlertDto.severity)) {
       throw new BadRequestException('Invalid severity level');
     }
 
+    // Validate alert type enum
+    if (!Object.values(AlertTypeEnum).includes(createAlertDto.alertType)) {
+      throw new BadRequestException('Invalid alert type');
+    }
+
     // Set default status to OPEN
-    const alertData = {
-      ...createAlertDto,
+    const alertData: Partial<AlertEntity> = {
+      severity: createAlertDto.severity,
+      merchantId: createAlertDto.merchantId,
+      alertType: createAlertDto.alertType,
+      assignedToUser: createAlertDto.assignedToUser,
+      summary: createAlertDto.summary,
+      followUpReason: createAlertDto.followUpReason,
       status: AlertStatusEnum.OPEN,
     };
+
+    // Handle comment - initialize comments array if comment is provided
+    if (createAlertDto.comment) {
+      alertData.comments = [createAlertDto.comment];
+    }
 
     return this.alertsRepository.create(alertData);
   }
@@ -118,9 +139,51 @@ export class AlertsService {
     };
   }
 
+  async updateAlertAssignment(
+    id: string,
+    updateAlertAssignmentDto: UpdateAlertAssignmentDto,
+  ): Promise<AlertEntity> {
+    // Check if alert exists
+    const existingAlert = await this.alertsRepository.findById(id);
+    if (!existingAlert) {
+      throw new NotFoundException(`Alert with ID ${id} not found`);
+    }
+
+    const { assignedToUser, comment } = updateAlertAssignmentDto;
+
+    // Update alert
+    const updateData: Partial<AlertEntity> = {};
+
+    if (assignedToUser !== undefined) {
+      updateData.assignedToUser = assignedToUser;
+    }
+
+    if (comment !== undefined) {
+      // Initialize comments array if it doesn't exist, or append to existing array
+      const existingComments = existingAlert.comments || [];
+      updateData.comments = [...existingComments, comment];
+    }
+
+    const updatedAlert = await this.alertsRepository.update(id, updateData);
+    if (!updatedAlert) {
+      throw new NotFoundException(`Failed to update alert with ID ${id}`);
+    }
+
+    return updatedAlert;
+  }
+
   async searchAlerts(filters: SearchAlertsDto) {
-    const { severity, fromDate, toDate, status, merchantId, page, limit } =
-      filters;
+    const {
+      severity,
+      alertType,
+      assignedToUser,
+      fromDate,
+      toDate,
+      status,
+      merchantId,
+      page,
+      limit,
+    } = filters;
 
     // Validate date range if both dates are provided
     if (fromDate && toDate) {
@@ -139,6 +202,8 @@ export class AlertsService {
 
     const result = await this.alertsRepository.findWithFilters(
       severity,
+      alertType,
+      assignedToUser,
       filters.fromDate,
       filters.toDate,
       status,

@@ -1,10 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, SelectQueryBuilder } from 'typeorm';
+import { Repository } from 'typeorm';
 import { AlertEntity } from '../../entities/alert.entity/alert.entity';
 import { CallLogEntity } from '../../entities/call-log.entity/call-log.entity';
 import { AlertSeverityEnum } from '../../enum/alert.severity.enum';
 import { AlertStatusEnum } from '../../enum/alert.status.enum';
+import { AlertTypeEnum } from '../../enum/alert.type.enum';
 
 @Injectable()
 export class AlertsRepository {
@@ -17,6 +18,8 @@ export class AlertsRepository {
 
   async findWithFilters(
     severity?: AlertSeverityEnum,
+    alertType?: AlertTypeEnum,
+    assignedToUser?: string,
     fromDate?: string,
     toDate?: string,
     status?: AlertStatusEnum,
@@ -29,6 +32,16 @@ export class AlertsRepository {
     // Apply filters
     if (severity) {
       queryBuilder.andWhere('alert.severity = :severity', { severity });
+    }
+
+    if (alertType) {
+      queryBuilder.andWhere('alert.alertType = :alertType', { alertType });
+    }
+
+    if (assignedToUser) {
+      queryBuilder.andWhere('alert.assignedToUser = :assignedToUser', {
+        assignedToUser,
+      });
     }
 
     if (fromDate) {
@@ -59,6 +72,8 @@ export class AlertsRepository {
     // Calculate stats
     const stats = await this.calculateSeverityStats(
       severity,
+      alertType,
+      assignedToUser,
       fromDate,
       toDate,
       status,
@@ -98,6 +113,8 @@ export class AlertsRepository {
 
   private async calculateSeverityStats(
     severity?: AlertSeverityEnum,
+    alertType?: AlertTypeEnum,
+    assignedToUser?: string,
     fromDate?: string,
     toDate?: string,
     status?: AlertStatusEnum,
@@ -108,6 +125,16 @@ export class AlertsRepository {
     // Apply same filters as main query
     if (severity) {
       queryBuilder.andWhere('alert.severity = :severity', { severity });
+    }
+
+    if (alertType) {
+      queryBuilder.andWhere('alert.alertType = :alertType', { alertType });
+    }
+
+    if (assignedToUser) {
+      queryBuilder.andWhere('alert.assignedToUser = :assignedToUser', {
+        assignedToUser,
+      });
     }
 
     if (fromDate) {

@@ -11,6 +11,7 @@ import {
 import { AlertsService } from '../services/alerts.service';
 import { CreateAlertDto } from '../dto/create-alert.dto';
 import { UpdateAlertStatusDto } from '../dto/update-alert-status.dto';
+import { UpdateAlertAssignmentDto } from '../dto/update-alert-assignment.dto';
 import { SearchAlertsDto } from '../dto/search-alerts.dto';
 
 @Controller('alerts')
@@ -28,6 +29,17 @@ export class AlertsController {
     @Body() updateAlertStatusDto: UpdateAlertStatusDto,
   ) {
     return this.alertsService.updateAlertStatus(id, updateAlertStatusDto);
+  }
+
+  @Put(':id/assignment')
+  async updateAlertAssignment(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() updateAlertAssignmentDto: UpdateAlertAssignmentDto,
+  ) {
+    return this.alertsService.updateAlertAssignment(
+      id,
+      updateAlertAssignmentDto,
+    );
   }
 
   @Post('search')

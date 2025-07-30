@@ -1,7 +1,6 @@
 import {
   IsEnum,
   IsOptional,
-  IsString,
   IsDateString,
   IsNumber,
   Min,
@@ -10,11 +9,20 @@ import {
 import { Type } from 'class-transformer';
 import { AlertSeverityEnum } from '../../enum/alert.severity.enum';
 import { AlertStatusEnum } from '../../enum/alert.status.enum';
+import { AlertTypeEnum } from '../../enum/alert.type.enum';
 
 export class SearchAlertsDto {
   @IsOptional()
   @IsEnum(AlertSeverityEnum)
   severity?: AlertSeverityEnum;
+
+  @IsOptional()
+  @IsEnum(AlertTypeEnum)
+  alertType?: AlertTypeEnum;
+
+  @IsOptional()
+  @IsUUID()
+  assignedToUser?: string;
 
   @IsOptional()
   @IsDateString()
