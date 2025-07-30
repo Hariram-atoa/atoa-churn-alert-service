@@ -12,7 +12,7 @@ export const databaseConfig: TypeOrmModuleOptions = {
   database: process.env.DB_NAME || 'atoa_churn_alert',
   entities: [UserSnapshotEntity, AlertEntity, CallLogEntity],
   synchronize: false, // Set to false for production
-  logging: process.env.NODE_ENV === 'development',
+  logging: false, // process.env.NODE_ENV === 'development',
   migrations: ['dist/migrations/*.js'],
   migrationsRun: false,
   migrationsTableName: 'migrations',

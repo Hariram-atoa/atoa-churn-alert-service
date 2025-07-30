@@ -8,7 +8,7 @@ import {
 } from 'typeorm';
 
 @Entity('user_snapshot_entity')
-@Index('user_snapshot_entity_merchant_id_index', ['merchantId'])
+@Index('user_snapshot_entity_business_id_index', ['businessId'])
 @Index('user_snapshot_entity_userid_index', ['userId'])
 @Index('user_snapshot_entity_store_id_index', ['storeId'])
 export class UserSnapshotEntity {
@@ -16,9 +16,9 @@ export class UserSnapshotEntity {
   id: string;
 
   @Column({ type: 'uuid', nullable: true })
-  merchantId: string;
+  businessId: string;
 
-  @Column({ type: 'uuid', nullable: false })
+  @Column({ type: 'uuid', nullable: true })
   userId: string;
 
   @Column({ type: 'date', nullable: false })

@@ -7,6 +7,8 @@ import { databaseConfig } from './config/database.config';
 import { CommunicationModule } from './communication/communication.module';
 import { AlertsModule } from './alerts/alerts.module';
 import { CallLogsModule } from './call-logs/call-logs.module';
+import { CoreModule } from './core/core.module';
+import { PaymentModule } from './payment/payment.module';
 
 @Module({
   imports: [
@@ -15,6 +17,8 @@ import { CallLogsModule } from './call-logs/call-logs.module';
     CommunicationModule,
     AlertsModule,
     CallLogsModule,
+    CoreModule,
+    PaymentModule,
   ],
   controllers: [AppController],
   providers: [AppService],
