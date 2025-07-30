@@ -8,6 +8,7 @@ import {
 } from 'typeorm';
 import { AlertSeverityEnum } from '../../enum/alert.severity.enum';
 import { AlertStatusEnum } from '../../enum/alert.status.enum';
+import { AlertTypeEnum } from '../../enum/alert.type.enum';
 
 @Entity('alert_entity')
 @Index('alert_entity_merchant_id_index', ['merchantId'])
@@ -48,4 +49,16 @@ export class AlertEntity {
 
   @Column({ nullable: true })
   followUpReason?: string;
+
+  @Column({ type: 'enum', nullable: false, enum: AlertTypeEnum })
+  alertType: AlertTypeEnum;
+
+  @Column({ type: 'uuid', nullable: true })
+  assignedToUser?: string;
+
+  @Column({ type: 'jsonb', nullable: true })
+  comments?: {
+    fromUser: string;
+    comment: string;
+  }[];
 }
