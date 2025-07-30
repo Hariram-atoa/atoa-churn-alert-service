@@ -28,7 +28,7 @@ export class CallLogEntity {
   createdAt: Date;
 
   @Column({
-    length: 255,
+    type: 'enum',
     nullable: false,
     enum: CallStatusEnum,
   })

@@ -16,7 +16,7 @@ export class AlertEntity {
   id: string;
 
   @Column({
-    length: 255,
+    type: 'enum',
     nullable: false,
     enum: AlertSeverityEnum,
   })
@@ -37,7 +37,7 @@ export class AlertEntity {
   updatedAt: Date;
 
   @Column({
-    length: 255,
+    type: 'enum',
     nullable: false,
     enum: AlertStatusEnum,
   })

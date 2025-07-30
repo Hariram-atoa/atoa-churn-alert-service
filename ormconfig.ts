@@ -2,6 +2,10 @@ import { DataSource } from 'typeorm';
 import { UserSnapshotEntity } from './src/entities/user-snapshot.entity/user-snapshot.entity';
 import { AlertEntity } from './src/entities/alert.entity/alert.entity';
 import { CallLogEntity } from './src/entities/call-log.entity/call-log.entity';
+import * as dotenv from 'dotenv';
+
+// Load environment variables for TypeORM
+dotenv.config();
 
 export default new DataSource({
   type: 'postgres',

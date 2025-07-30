@@ -8,7 +8,7 @@ export const databaseConfig: TypeOrmModuleOptions = {
   host: process.env.DB_HOST || 'localhost',
   port: parseInt(process.env.DB_PORT) || 5432,
   username: process.env.DB_USERNAME || 'postgres',
-  password: process.env.DB_PASSWORD || 'password',
+  password: process.env.DB_PASSWORD || 'postgres',
   database: process.env.DB_NAME || 'atoa_churn_alert',
   entities: [UserSnapshotEntity, AlertEntity, CallLogEntity],
   synchronize: false, // Set to false for production

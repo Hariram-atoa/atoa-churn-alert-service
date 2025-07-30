@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class InitialMigration1753870201672 implements MigrationInterface {
-  name = 'InitialMigration1753870201672';
+export class InitialMigration1753877232902 implements MigrationInterface {
+  name = 'InitialMigration1753877232902';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(
@@ -17,13 +17,22 @@ export class InitialMigration1753870201672 implements MigrationInterface {
       `CREATE INDEX "user_snapshot_entity_merchant_id_index" ON "user_snapshot_entity" ("merchantId") `,
     );
     await queryRunner.query(
-      `CREATE TABLE "alert_entity" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "severity" character varying(255) NOT NULL, "merchantId" uuid NOT NULL, "summary" jsonb, "createdAt" TIMESTAMP NOT NULL DEFAULT now(), "updatedAt" TIMESTAMP NOT NULL DEFAULT now(), "status" character varying(255) NOT NULL, "followUpDate" date, "followUpReason" character varying, CONSTRAINT "PK_ff36cd7694aa7383f54792290f7" PRIMARY KEY ("id"))`,
+      `CREATE TYPE "public"."alert_entity_severity_enum" AS ENUM('Low', 'Medium', 'High', 'Critical')`,
+    );
+    await queryRunner.query(
+      `CREATE TYPE "public"."alert_entity_status_enum" AS ENUM('Open', 'Resolved')`,
+    );
+    await queryRunner.query(
+      `CREATE TABLE "alert_entity" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "severity" "public"."alert_entity_severity_enum" NOT NULL, "merchantId" uuid NOT NULL, "summary" jsonb, "createdAt" TIMESTAMP NOT NULL DEFAULT now(), "updatedAt" TIMESTAMP NOT NULL DEFAULT now(), "status" "public"."alert_entity_status_enum" NOT NULL, "followUpDate" date, "followUpReason" character varying, CONSTRAINT "PK_ff36cd7694aa7383f54792290f7" PRIMARY KEY ("id"))`,
     );
     await queryRunner.query(
       `CREATE INDEX "alert_entity_merchant_id_index" ON "alert_entity" ("merchantId") `,
     );
     await queryRunner.query(
-      `CREATE TABLE "call_log_entity" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "callId" character varying, "calledBy" character varying(255) NOT NULL, "createdAt" TIMESTAMP NOT NULL DEFAULT now(), "callStatus" character varying(255) NOT NULL, "summary" character varying(255), "alert_id" uuid, CONSTRAINT "PK_7e304109cab3f2faa4ee8939f67" PRIMARY KEY ("id"))`,
+      `CREATE TYPE "public"."call_log_entity_callstatus_enum" AS ENUM('Re-Engaged', 'Not Interested', 'Bounced', 'Callback Scheduled')`,
+    );
+    await queryRunner.query(
+      `CREATE TABLE "call_log_entity" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "callId" character varying, "calledBy" character varying(255) NOT NULL, "createdAt" TIMESTAMP NOT NULL DEFAULT now(), "callStatus" "public"."call_log_entity_callstatus_enum" NOT NULL, "summary" character varying(255), "alert_id" uuid, CONSTRAINT "PK_7e304109cab3f2faa4ee8939f67" PRIMARY KEY ("id"))`,
     );
     await queryRunner.query(
       `ALTER TABLE "call_log_entity" ADD CONSTRAINT "FK_8aed2a50c05ef8e2d197b9fc894" FOREIGN KEY ("alert_id") REFERENCES "alert_entity"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`,
@@ -36,9 +45,14 @@ export class InitialMigration1753870201672 implements MigrationInterface {
     );
     await queryRunner.query(`DROP TABLE "call_log_entity"`);
     await queryRunner.query(
+      `DROP TYPE "public"."call_log_entity_callstatus_enum"`,
+    );
+    await queryRunner.query(
       `DROP INDEX "public"."alert_entity_merchant_id_index"`,
     );
     await queryRunner.query(`DROP TABLE "alert_entity"`);
+    await queryRunner.query(`DROP TYPE "public"."alert_entity_status_enum"`);
+    await queryRunner.query(`DROP TYPE "public"."alert_entity_severity_enum"`);
     await queryRunner.query(
       `DROP INDEX "public"."user_snapshot_entity_merchant_id_index"`,
     );
