@@ -10,7 +10,7 @@ import { CallStatusEnum } from './enum/call.status.enum';
 
 async function seedDummyData() {
   const app = await NestFactory.createApplicationContext(AppModule);
-  
+
   const alertRepository = app.get(getRepositoryToken(AlertEntity));
   const callLogRepository = app.get(getRepositoryToken(CallLogEntity));
 
@@ -26,7 +26,7 @@ async function seedDummyData() {
         previousGtv: 50000,
         currentGtv: 15000,
         dropPercentage: 70,
-        riskLevel: 'High'
+        riskLevel: 'High',
       },
       status: AlertStatusEnum.OPEN,
       alertType: AlertTypeEnum.GTV_DROP,
@@ -34,9 +34,9 @@ async function seedDummyData() {
       comments: [
         {
           fromUser: '550e8400-e29b-41d4-a716-446655440010',
-          comment: 'Critical GTV drop detected. Immediate action required.'
-        }
-      ]
+          comment: 'Critical GTV drop detected. Immediate action required.',
+        },
+      ],
     },
     // High TC Drop - Open
     {
@@ -46,7 +46,7 @@ async function seedDummyData() {
         previousTc: 150,
         currentTc: 80,
         dropPercentage: 47,
-        riskLevel: 'Medium'
+        riskLevel: 'Medium',
       },
       status: AlertStatusEnum.OPEN,
       alertType: AlertTypeEnum.TC_DROP,
@@ -54,9 +54,9 @@ async function seedDummyData() {
       comments: [
         {
           fromUser: '550e8400-e29b-41d4-a716-446655440012',
-          comment: 'Significant TC drop. Need to investigate root cause.'
-        }
-      ]
+          comment: 'Significant TC drop. Need to investigate root cause.',
+        },
+      ],
     },
     // Medium GTV Drop - Resolved
     {
@@ -66,7 +66,7 @@ async function seedDummyData() {
         previousGtv: 30000,
         currentGtv: 22000,
         dropPercentage: 27,
-        riskLevel: 'Low'
+        riskLevel: 'Low',
       },
       status: AlertStatusEnum.RESOLVED,
       alertType: AlertTypeEnum.GTV_DROP,
@@ -76,9 +76,9 @@ async function seedDummyData() {
       comments: [
         {
           fromUser: '550e8400-e29b-41d4-a716-446655440014',
-          comment: 'Issue resolved after discussion with merchant.'
-        }
-      ]
+          comment: 'Issue resolved after discussion with merchant.',
+        },
+      ],
     },
     // Low TC Drop - Open
     {
@@ -88,16 +88,16 @@ async function seedDummyData() {
         previousTc: 50,
         currentTc: 45,
         dropPercentage: 10,
-        riskLevel: 'Low'
+        riskLevel: 'Low',
       },
       status: AlertStatusEnum.OPEN,
       alertType: AlertTypeEnum.TC_DROP,
       comments: [
         {
           fromUser: '550e8400-e29b-41d4-a716-446655440016',
-          comment: 'Minor TC drop. Monitoring required.'
-        }
-      ]
+          comment: 'Minor TC drop. Monitoring required.',
+        },
+      ],
     },
     // Critical GTV Drop - Open (Unassigned)
     {
@@ -107,16 +107,16 @@ async function seedDummyData() {
         previousGtv: 75000,
         currentGtv: 20000,
         dropPercentage: 73,
-        riskLevel: 'Critical'
+        riskLevel: 'Critical',
       },
       status: AlertStatusEnum.OPEN,
       alertType: AlertTypeEnum.GTV_DROP,
       comments: [
         {
           fromUser: '550e8400-e29b-41d4-a716-446655440018',
-          comment: 'New critical alert. Needs immediate assignment.'
-        }
-      ]
+          comment: 'New critical alert. Needs immediate assignment.',
+        },
+      ],
     },
     // High TC Drop - Resolved
     {
@@ -126,7 +126,7 @@ async function seedDummyData() {
         previousTc: 200,
         currentTc: 120,
         dropPercentage: 40,
-        riskLevel: 'Medium'
+        riskLevel: 'Medium',
       },
       status: AlertStatusEnum.RESOLVED,
       alertType: AlertTypeEnum.TC_DROP,
@@ -136,9 +136,9 @@ async function seedDummyData() {
       comments: [
         {
           fromUser: '550e8400-e29b-41d4-a716-446655440020',
-          comment: 'Technical issue was causing the drop. Fixed now.'
-        }
-      ]
+          comment: 'Technical issue was causing the drop. Fixed now.',
+        },
+      ],
     },
     // Medium GTV Drop - Open
     {
@@ -148,7 +148,7 @@ async function seedDummyData() {
         previousGtv: 45000,
         currentGtv: 32000,
         dropPercentage: 29,
-        riskLevel: 'Medium'
+        riskLevel: 'Medium',
       },
       status: AlertStatusEnum.OPEN,
       alertType: AlertTypeEnum.GTV_DROP,
@@ -156,9 +156,9 @@ async function seedDummyData() {
       comments: [
         {
           fromUser: '550e8400-e29b-41d4-a716-446655440022',
-          comment: 'Investigating the cause of GTV drop.'
-        }
-      ]
+          comment: 'Investigating the cause of GTV drop.',
+        },
+      ],
     },
     // Low TC Drop - Resolved
     {
@@ -168,7 +168,7 @@ async function seedDummyData() {
         previousTc: 30,
         currentTc: 28,
         dropPercentage: 7,
-        riskLevel: 'Low'
+        riskLevel: 'Low',
       },
       status: AlertStatusEnum.RESOLVED,
       alertType: AlertTypeEnum.TC_DROP,
@@ -178,10 +178,10 @@ async function seedDummyData() {
       comments: [
         {
           fromUser: '550e8400-e29b-41d4-a716-446655440024',
-          comment: 'Minor fluctuation. No action needed.'
-        }
-      ]
-    }
+          comment: 'Minor fluctuation. No action needed.',
+        },
+      ],
+    },
   ];
 
   // Insert alerts
@@ -196,14 +196,15 @@ async function seedDummyData() {
       callId: 'call_001',
       calledBy: '550e8400-e29b-41d4-a716-446655440010',
       callStatus: CallStatusEnum.RE_ENGAGED,
-      summary: 'Merchant was concerned about the drop. Provided support and solutions.'
+      summary:
+        'Merchant was concerned about the drop. Provided support and solutions.',
     },
     {
       alert: savedAlerts[0],
       callId: 'call_002',
       calledBy: '550e8400-e29b-41d4-a716-446655440011',
       callStatus: CallStatusEnum.CALLBACK,
-      summary: 'Scheduled follow-up call for next week.'
+      summary: 'Scheduled follow-up call for next week.',
     },
     // Call logs for High TC Drop Alert
     {
@@ -211,14 +212,14 @@ async function seedDummyData() {
       callId: 'call_003',
       calledBy: '550e8400-e29b-41d4-a716-446655440012',
       callStatus: CallStatusEnum.NO_ANSWER,
-      summary: 'No answer. Left voicemail.'
+      summary: 'No answer. Left voicemail.',
     },
     {
       alert: savedAlerts[1],
       callId: 'call_004',
       calledBy: '550e8400-e29b-41d4-a716-446655440013',
       callStatus: CallStatusEnum.NOT_INTERESTED,
-      summary: 'Merchant not interested in discussing the issue.'
+      summary: 'Merchant not interested in discussing the issue.',
     },
     // Call logs for Medium GTV Drop Alert (Resolved)
     {
@@ -226,7 +227,7 @@ async function seedDummyData() {
       callId: 'call_005',
       calledBy: '550e8400-e29b-41d4-a716-446655440014',
       callStatus: CallStatusEnum.RE_ENGAGED,
-      summary: 'Discussed seasonal business patterns. Issue resolved.'
+      summary: 'Discussed seasonal business patterns. Issue resolved.',
     },
     // Call logs for Low TC Drop Alert
     {
@@ -234,7 +235,7 @@ async function seedDummyData() {
       callId: 'call_006',
       calledBy: '550e8400-e29b-41d4-a716-446655440016',
       callStatus: CallStatusEnum.RE_ENGAGED,
-      summary: 'Minor fluctuation explained. No immediate action needed.'
+      summary: 'Minor fluctuation explained. No immediate action needed.',
     },
     // Call logs for Critical GTV Drop Alert (Unassigned)
     {
@@ -242,7 +243,7 @@ async function seedDummyData() {
       callId: 'call_007',
       calledBy: '550e8400-e29b-41d4-a716-446655440018',
       callStatus: CallStatusEnum.NO_ANSWER,
-      summary: 'No answer. Critical alert needs immediate attention.'
+      summary: 'No answer. Critical alert needs immediate attention.',
     },
     // Call logs for High TC Drop Alert (Resolved)
     {
@@ -250,7 +251,7 @@ async function seedDummyData() {
       callId: 'call_008',
       calledBy: '550e8400-e29b-41d4-a716-446655440020',
       callStatus: CallStatusEnum.RE_ENGAGED,
-      summary: 'Technical issue identified and resolved.'
+      summary: 'Technical issue identified and resolved.',
     },
     // Call logs for Medium GTV Drop Alert
     {
@@ -258,14 +259,14 @@ async function seedDummyData() {
       callId: 'call_009',
       calledBy: '550e8400-e29b-41d4-a716-446655440022',
       callStatus: CallStatusEnum.CALLBACK,
-      summary: 'Scheduled investigation call.'
+      summary: 'Scheduled investigation call.',
     },
     {
       alert: savedAlerts[6],
       callId: 'call_010',
       calledBy: '550e8400-e29b-41d4-a716-446655440023',
       callStatus: CallStatusEnum.RE_ENGAGED,
-      summary: 'Investigation in progress. Gathering more information.'
+      summary: 'Investigation in progress. Gathering more information.',
     },
     // Call logs for Low TC Drop Alert (Resolved)
     {
@@ -273,8 +274,8 @@ async function seedDummyData() {
       callId: 'call_011',
       calledBy: '550e8400-e29b-41d4-a716-446655440024',
       callStatus: CallStatusEnum.RE_ENGAGED,
-      summary: 'Confirmed normal business fluctuation. No action required.'
-    }
+      summary: 'Confirmed normal business fluctuation. No action required.',
+    },
   ];
 
   // Insert call logs
@@ -295,4 +296,4 @@ async function seedDummyData() {
   await app.close();
 }
 
-seedDummyData().catch(console.error); 
+seedDummyData().catch(console.error);
