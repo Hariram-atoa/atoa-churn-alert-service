@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, SelectQueryBuilder } from 'typeorm';
+import { Repository } from 'typeorm';
 import { AlertEntity } from '../../entities/alert.entity/alert.entity';
 import { CallLogEntity } from '../../entities/call-log.entity/call-log.entity';
 import { AlertSeverityEnum } from '../../enum/alert.severity.enum';
