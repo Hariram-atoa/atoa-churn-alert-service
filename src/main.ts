@@ -8,6 +8,15 @@ dotenv.config();
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  // Enable CORS with all origins allowed
+  app.enableCors({
+    origin: true, // Allow all origins
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+    credentials: true, // Allow credentials (cookies, authorization headers)
+  });
+
   const config = new DocumentBuilder()
     .setTitle('Atoa Churn Alert Service')
     .setDescription('API documentation for the Atoa Churn Alert Service')
