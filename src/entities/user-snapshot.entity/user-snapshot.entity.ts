@@ -32,7 +32,7 @@ export class UserSnapshotEntity {
     [key: string]: any;
   };
 
-  @Column({ type: 'uuid', nullable: false })
+  @Column({ type: 'uuid', nullable: true })
   storeId: string;
 
   @Column({ type: 'integer', nullable: true })

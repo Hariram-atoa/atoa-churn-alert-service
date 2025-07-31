@@ -13,15 +13,10 @@ export class CommunicationController {
 
   @Post('/trigger-slack-alert')
   async triggerSlackAlert(@Body() triggerSlackAlertDto: TriggerSlackAlertDto) {
-    const { alertLevel, businessName, reason, summary } = triggerSlackAlertDto;
+    const { message } = triggerSlackAlertDto;
 
     try {
-      const result = await this.slackService.triggerSlackAlert(
-        alertLevel,
-        businessName,
-        reason,
-        summary,
-      );
+      const result = await this.slackService.triggerSlackAlert(message);
 
       return result
         ? `Slack alert triggered successfully.`
