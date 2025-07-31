@@ -16,4 +16,5 @@ export const databaseConfig: TypeOrmModuleOptions = {
   migrations: ['dist/migrations/*.js'],
   migrationsRun: false,
   migrationsTableName: 'migrations',
+  ssl: process.env.DB_HOST && process.env.DB_HOST.includes('rds.amazonaws.com') ? { rejectUnauthorized: false } : false,
 };

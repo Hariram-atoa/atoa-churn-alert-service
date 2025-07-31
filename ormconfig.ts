@@ -23,4 +23,5 @@ export default new DataSource({
   ],
   migrations: ['src/migrations/*.ts'],
   migrationsTableName: 'migrations',
+  ssl: process.env.DB_HOST && process.env.DB_HOST.includes('rds.amazonaws.com') ? { rejectUnauthorized: false } : false,
 });
