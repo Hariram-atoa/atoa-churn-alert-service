@@ -36,7 +36,6 @@ export class AlertsService {
       const merchant = await this.coreService.getMerchantById(merchantId);
       const merchantPlan =
         await this.paymentService.getMerchantPlanName(merchantId);
-      console.log(merchantPlan);
       merchant.merchantPlanName = merchantPlan.planName;
       return merchant ? (merchant as MerchantDto) : null;
     } catch (error) {
@@ -58,7 +57,6 @@ export class AlertsService {
         .filter((id, index, arr) => arr.indexOf(id) === index);
       const merchants =
         await this.coreService.getBulkMerchantByIds(merchantIds);
-      console.log(merchants);
 
       const merchantMap = new Map<string, MerchantDto>();
 
@@ -69,7 +67,6 @@ export class AlertsService {
             try {
               const merchantPlan =
                 await this.paymentService.getMerchantPlanName(merchant.id);
-              console.log(merchantPlan);
 
               // Check if merchantPlan has data and extract planName safely
               if (
@@ -94,8 +91,6 @@ export class AlertsService {
           }
         }),
       );
-
-      console.log(merchantMap);
 
       return merchantMap;
     } catch (error) {
@@ -339,9 +334,12 @@ export class AlertsService {
     };
   }
 
-  async getAlertById(
-    id: string,
-  ): Promise<{ alert: AlertEntity; callLogs: CallLogEntity[] }> {
+  async getAlertById(id: string): Promise<{
+    merchant: MerchantDto;
+    alert: AlertEntity;
+    callLogs: CallLogEntity[];
+    monthlyTransactionData: any[];
+  }> {
     if (!id) {
       throw new BadRequestException('Alert ID is required');
     }
@@ -356,13 +354,18 @@ export class AlertsService {
 
     // Get merchant data
     const merchant = await this.getMerchantData(alert.merchantId);
-    if (merchant) {
-      (alert as any).merchant = merchant;
-    }
+
+    //Get last 6 months transaction data
+    const lastSixMonthsTransactionData =
+      await this.paymentService.getLastSixMonthsTransactionData(
+        alert.merchantId,
+      );
 
     return {
+      merchant,
       alert,
       callLogs,
+      monthlyTransactionData: lastSixMonthsTransactionData,
     };
   }
 

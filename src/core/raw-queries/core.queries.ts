@@ -43,4 +43,10 @@ export const CORE_QUERIES = {
     LEFT JOIN merchant_business_type_entity mbt ON mbi."businessTypeId" = mbt.id
     WHERE me.id = ANY($1)
   `,
+
+  GET_DASHBOARD_USERS_BY_TELE_CALLER_ROLE: `
+    SELECT * FROM dashboard_user_entity du
+    LEFT JOIN role_entity re ON du."roleId" = re.id
+    WHERE re."name" = $1
+  `,
 };

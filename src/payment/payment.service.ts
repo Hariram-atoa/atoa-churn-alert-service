@@ -11,4 +11,11 @@ export class PaymentService {
       [merchantId],
     );
   }
+
+  async getLastSixMonthsTransactionData(merchantId: string): Promise<any> {
+    return this.paymentRepository.executeRawQuery(
+      PAYMENT_QUERIES.GET_LAST_SIX_MONTH_TRANSACTION,
+      [merchantId],
+    );
+  }
 }
