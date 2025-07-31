@@ -73,8 +73,10 @@ export class CallLogsRepository {
   }
 
   async create(callLogData: Partial<CallLogEntity>): Promise<CallLogEntity> {
-    const callLog = this.callLogRepository.create(callLogData);
-    return this.callLogRepository.save(callLog);
+    const callLog = await this.callLogRepository.save(callLogData);
+    return this.callLogRepository.findOne({
+      where: { id: callLog.id },
+    });
   }
 
   async update(

@@ -243,6 +243,10 @@ export class AlertsService {
 
     // Update alert
     const updateData: Partial<AlertEntity> = {};
+    //handle the case where the alert is resolved and we are assigning it to a user
+    if (existingAlert.status === AlertStatusEnum.RESOLVED) {
+      updateData.status = AlertStatusEnum.OPEN;
+    }
 
     if (assignedToUser !== undefined) {
       updateData.assignedToUser = assignedToUser;
@@ -335,7 +339,6 @@ export class AlertsService {
   }
 
   async getAlertById(id: string): Promise<{
-    merchant: MerchantDto;
     alert: AlertEntity;
     callLogs: CallLogEntity[];
     monthlyTransactionData: any[];
@@ -354,6 +357,9 @@ export class AlertsService {
 
     // Get merchant data
     const merchant = await this.getMerchantData(alert.merchantId);
+    if (merchant) {
+      (alert as any).merchant = merchant;
+    }
 
     //Get last 6 months transaction data
     const lastSixMonthsTransactionData =
@@ -362,7 +368,6 @@ export class AlertsService {
       );
 
     return {
-      merchant,
       alert,
       callLogs,
       monthlyTransactionData: lastSixMonthsTransactionData,

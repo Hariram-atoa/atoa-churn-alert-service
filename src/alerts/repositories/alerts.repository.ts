@@ -64,8 +64,19 @@ export class AlertsRepository {
     const skip = (page - 1) * limit;
     queryBuilder.skip(skip).take(limit);
 
-    // Order by creation date (newest first)
-    queryBuilder.orderBy('alert.createdAt', 'DESC');
+    // Order by severity first (Critical > High > Medium > Low), then by creation date (newest first)
+    queryBuilder
+      .orderBy(
+        `CASE 
+        WHEN alert.severity = 'Critical' THEN 1
+        WHEN alert.severity = 'High' THEN 2
+        WHEN alert.severity = 'Medium' THEN 3
+        WHEN alert.severity = 'Low' THEN 4
+        ELSE 5
+      END`,
+        'ASC',
+      )
+      .addOrderBy('alert.createdAt', 'DESC');
 
     const [data, total] = await queryBuilder.getManyAndCount();
 
