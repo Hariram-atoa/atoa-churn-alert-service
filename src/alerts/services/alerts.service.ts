@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { AlertsRepository } from '../repositories/alerts.repository';
 import { CallLogsRepository } from '../../call-logs/repositories/call-logs.repository';
+import { CoreService } from '../../core/core.service';
 import { AlertEntity } from '../../entities/alert.entity/alert.entity';
 import { CallLogEntity } from '../../entities/call-log.entity/call-log.entity';
 import { CreateAlertDto } from '../dto/create-alert.dto';
@@ -15,13 +16,88 @@ import { AlertSeverityEnum } from '../../enum/alert.severity.enum';
 import { AlertStatusEnum } from '../../enum/alert.status.enum';
 import { AlertTypeEnum } from '../../enum/alert.type.enum';
 import { CallStatusEnum } from '../../enum/call.status.enum';
+import { MerchantDto } from '../../core/dto/merchant.dto';
+import { PaymentService } from '../../payment/payment.service';
 
 @Injectable()
 export class AlertsService {
   constructor(
     private readonly alertsRepository: AlertsRepository,
     private readonly callLogsRepository: CallLogsRepository,
+    private readonly coreService: CoreService,
+    private readonly paymentService: PaymentService,
   ) {}
+
+  // Helper function to fetch single merchant data
+  private async getMerchantData(
+    merchantId: string,
+  ): Promise<MerchantDto | null> {
+    try {
+      const merchant = await this.coreService.getMerchantById(merchantId);
+      const merchantPlan =
+        await this.paymentService.getMerchantPlanName(merchantId);
+      merchant.merchantPlanName = merchantPlan.planName;
+      return merchant ? (merchant as MerchantDto) : null;
+    } catch (error) {
+      console.error(
+        `Error fetching merchant data for ID ${merchantId}:`,
+        error,
+      );
+      return null;
+    }
+  }
+
+  // Helper function to fetch bulk merchant data and map to alerts
+  private async getBulkMerchantData(
+    alerts: AlertEntity[],
+  ): Promise<Map<string, MerchantDto>> {
+    try {
+      const merchantIds = alerts
+        .map((alert) => alert.merchantId)
+        .filter((id, index, arr) => arr.indexOf(id) === index);
+      const merchants =
+        await this.coreService.getBulkMerchantByIds(merchantIds);
+
+      const merchantMap = new Map<string, MerchantDto>();
+
+      // Use Promise.all with map to wait for all async operations to complete
+      await Promise.all(
+        merchants.map(async (merchant) => {
+          if (merchant && merchant.id) {
+            try {
+              const merchantPlan =
+                await this.paymentService.getMerchantPlanName(merchant.id);
+
+              // Check if merchantPlan has data and extract planName safely
+              if (
+                merchantPlan &&
+                merchantPlan.length > 0 &&
+                merchantPlan[0].planName
+              ) {
+                merchant.merchantPlanName = merchantPlan[0].planName;
+              } else {
+                merchant.merchantPlanName = 'No Plan Assigned';
+              }
+
+              merchantMap.set(merchant.id, merchant);
+            } catch (error) {
+              console.error(
+                `Error fetching plan for merchant ${merchant.id}:`,
+                error,
+              );
+              merchant.merchantPlanName = 'Error Fetching Plan';
+              merchantMap.set(merchant.id, merchant);
+            }
+          }
+        }),
+      );
+
+      return merchantMap;
+    } catch (error) {
+      console.error('Error fetching bulk merchant data:', error);
+      return new Map();
+    }
+  }
 
   async createAlert(createAlertDto: CreateAlertDto): Promise<AlertEntity> {
     // Validate required fields
@@ -63,7 +139,15 @@ export class AlertsService {
       alertData.comments = [createAlertDto.comment];
     }
 
-    return this.alertsRepository.create(alertData);
+    const createdAlert = await this.alertsRepository.create(alertData);
+
+    // Get merchant data
+    const merchant = await this.getMerchantData(createdAlert.merchantId);
+    if (merchant) {
+      (createdAlert as any).merchant = merchant;
+    }
+
+    return createdAlert;
   }
 
   async updateAlertStatus(
@@ -99,6 +183,12 @@ export class AlertsService {
     const updatedAlert = await this.alertsRepository.update(id, updateData);
     if (!updatedAlert) {
       throw new NotFoundException(`Failed to update alert with ID ${id}`);
+    }
+
+    // Get merchant data
+    const merchant = await this.getMerchantData(updatedAlert.merchantId);
+    if (merchant) {
+      (updatedAlert as any).merchant = merchant;
     }
 
     let createdCallLog: CallLogEntity | undefined;
@@ -153,6 +243,10 @@ export class AlertsService {
 
     // Update alert
     const updateData: Partial<AlertEntity> = {};
+    //handle the case where the alert is resolved and we are assigning it to a user
+    if (existingAlert.status === AlertStatusEnum.RESOLVED) {
+      updateData.status = AlertStatusEnum.OPEN;
+    }
 
     if (assignedToUser !== undefined) {
       updateData.assignedToUser = assignedToUser;
@@ -167,6 +261,12 @@ export class AlertsService {
     const updatedAlert = await this.alertsRepository.update(id, updateData);
     if (!updatedAlert) {
       throw new NotFoundException(`Failed to update alert with ID ${id}`);
+    }
+
+    // Get merchant data
+    const merchant = await this.getMerchantData(updatedAlert.merchantId);
+    if (merchant) {
+      (updatedAlert as any).merchant = merchant;
     }
 
     return updatedAlert;
@@ -212,8 +312,20 @@ export class AlertsService {
       limit,
     );
 
+    // Get merchant data for all alerts
+    const merchantMap = await this.getBulkMerchantData(result.data);
+
+    // Attach merchant data to each alert
+    const alertsWithMerchants = result.data.map((alert) => {
+      const merchant = merchantMap.get(alert.merchantId);
+      if (merchant) {
+        (alert as any).merchant = merchant;
+      }
+      return alert;
+    });
+
     return {
-      data: result.data,
+      data: alertsWithMerchants,
       pagination: {
         page,
         limit,
@@ -226,9 +338,11 @@ export class AlertsService {
     };
   }
 
-  async getAlertById(
-    id: string,
-  ): Promise<{ alert: AlertEntity; callLogs: CallLogEntity[] }> {
+  async getAlertById(id: string): Promise<{
+    alert: AlertEntity;
+    callLogs: CallLogEntity[];
+    monthlyTransactionData: any[];
+  }> {
     if (!id) {
       throw new BadRequestException('Alert ID is required');
     }
@@ -241,9 +355,22 @@ export class AlertsService {
     // Get associated call logs
     const callLogs = await this.callLogsRepository.findByAlertId(id);
 
+    // Get merchant data
+    const merchant = await this.getMerchantData(alert.merchantId);
+    if (merchant) {
+      (alert as any).merchant = merchant;
+    }
+
+    //Get last 6 months transaction data
+    const lastSixMonthsTransactionData =
+      await this.paymentService.getLastSixMonthsTransactionData(
+        alert.merchantId,
+      );
+
     return {
       alert,
       callLogs,
+      monthlyTransactionData: lastSixMonthsTransactionData,
     };
   }
 

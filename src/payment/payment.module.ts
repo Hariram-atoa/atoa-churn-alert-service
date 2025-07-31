@@ -9,7 +9,7 @@ import { DataSource } from 'typeorm';
   imports: [
     TypeOrmModule.forRoot({
       ...paymentDataSourceConfig,
-      autoLoadEntities: true,
+      name: 'paymentDataSource',
     }),
   ],
   providers: [
@@ -17,8 +17,9 @@ import { DataSource } from 'typeorm';
     PaymentRepository,
     {
       provide: 'paymentDataSource',
-      useFactory: () => {
+      useFactory: async () => {
         const dataSource = new DataSource(paymentDataSourceConfig);
+        await dataSource.initialize();
         return dataSource;
       },
     },

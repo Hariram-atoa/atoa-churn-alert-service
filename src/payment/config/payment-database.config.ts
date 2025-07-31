@@ -4,10 +4,10 @@ import { DataSourceOptions } from 'typeorm';
 config();
 
 export const paymentDbConfig = {
-  host: process.env.DB_HOST_PAYMENT_READ || process.env.DB_HOST,
-  user: process.env.DB_USER_PAYMENT_READ || process.env.DB_USER,
-  password: process.env.DB_PASSWORD_PAYMENT_READ || process.env.DB_PASSWORD,
-  name: process.env.DB_NAME_PAYMENT_READ || process.env.DB_NAME,
+  host: process.env.DB_HOST_PAYMENT_READ || 'localhost',
+  user: process.env.DB_USER_PAYMENT_READ || 'postgres',
+  password: process.env.DB_PASSWORD_PAYMENT_READ || 'postgres',
+  name: process.env.DB_NAME_PAYMENT_READ || 'atoa_payments',
   port:
     parseInt(process.env.DB_PORT_PAYMENT_READ || process.env.DB_PORT) || 5432,
 };

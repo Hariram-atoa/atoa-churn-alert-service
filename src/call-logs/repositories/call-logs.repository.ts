@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, SelectQueryBuilder } from 'typeorm';
+import { Repository } from 'typeorm';
 import { CallLogEntity } from '../../entities/call-log.entity/call-log.entity';
 import { CallStatusEnum } from '../../enum/call.status.enum';
 
@@ -55,7 +55,12 @@ export class CallLogsRepository {
   async findByAlertId(alertId: string): Promise<CallLogEntity[]> {
     return this.callLogRepository.find({
       where: { alert: { id: alertId } },
-      relations: ['alert'],
+      select: {
+        calledBy: true,
+        callStatus: true,
+        summary: true,
+        createdAt: true,
+      },
       order: { createdAt: 'DESC' },
     });
   }
@@ -68,8 +73,10 @@ export class CallLogsRepository {
   }
 
   async create(callLogData: Partial<CallLogEntity>): Promise<CallLogEntity> {
-    const callLog = this.callLogRepository.create(callLogData);
-    return this.callLogRepository.save(callLog);
+    const callLog = await this.callLogRepository.save(callLogData);
+    return this.callLogRepository.findOne({
+      where: { id: callLog.id },
+    });
   }
 
   async update(

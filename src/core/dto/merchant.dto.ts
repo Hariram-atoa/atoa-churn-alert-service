@@ -14,12 +14,13 @@ export class MerchantDto {
 
   @Expose()
   @IsString()
-  name: string;
+  @IsOptional()
+  firstName?: string;
 
   @Expose()
   @IsString()
   @IsOptional()
-  businessName?: string;
+  lastName?: string;
 
   @Expose()
   @IsString()
@@ -43,12 +44,22 @@ export class MerchantDto {
   @Expose()
   @IsString()
   @IsOptional()
-  businessType?: string;
+  businessName?: string;
 
   @Expose()
   @IsString()
   @IsOptional()
   businessTypeId?: string;
+
+  @Expose()
+  @IsString()
+  @IsOptional()
+  businessType?: string;
+
+  @Expose()
+  @IsString()
+  @IsOptional()
+  merchantPlanName?: string;
 
   @Expose()
   @Transform(({ value }) => new Date(value))
