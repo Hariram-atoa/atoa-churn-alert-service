@@ -1,6 +1,7 @@
 import { AlertSeverityEnum } from '../../enum/alert.severity.enum';
 import { AlertStatusEnum } from '../../enum/alert.status.enum';
 import { AlertTypeEnum } from '../../enum/alert.type.enum';
+import { MerchantDto } from '../../core/dto/merchant.dto';
 
 export class AlertResponseDto {
   id: string;
@@ -21,6 +22,7 @@ export class AlertResponseDto {
     toUser: string;
     comment: string;
   }[];
+  merchant?: MerchantDto;
 }
 
 export class AlertWithCallLogsResponseDto extends AlertResponseDto {

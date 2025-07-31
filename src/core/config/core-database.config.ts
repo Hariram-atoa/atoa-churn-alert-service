@@ -4,10 +4,10 @@ import { DataSourceOptions } from 'typeorm';
 config();
 
 export const coreDbConfig = {
-  host: process.env.DB_HOST_CORE_READ || process.env.DB_HOST,
-  user: process.env.DB_USER_CORE_READ || process.env.DB_USER,
-  password: process.env.DB_PASSWORD_CORE_READ || process.env.DB_PASSWORD,
-  name: process.env.DB_NAME_CORE_READ || process.env.DB_NAME,
+  host: process.env.DB_HOST_CORE_READ || 'localhost',
+  user: process.env.DB_USER_CORE_READ || 'postgres',
+  password: process.env.DB_PASSWORD_CORE_READ || 'postgres',
+  name: process.env.DB_NAME_CORE_READ || 'atoa_core',
   port: parseInt(process.env.DB_PORT_CORE_READ || process.env.DB_PORT) || 5432,
 };
 
